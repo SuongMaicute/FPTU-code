@@ -1,0 +1,10 @@
+Ta bắt đầu với Monolithic Architecture(kiến trúc 1 khối):
+- Các chức năng xoay quanh 1 khối lõi
+- Lớn, mang tính thống nhất cao 
+- Khó đổi mới, update
+Từ đó, Microservices Architecture: 
+- Chia thành nhiều khối nhỏ, quản lí riêng biệt
+- dễ update
+- Phức tạp trong xử lí luồng và CSDL
+- Thường được hiểu sai là :"giúp hệ thống chạy nhanh hơn" hoặc "càng nhỏ càng tốt"
+- Phải đảm bảo dc tính nhất quán của CSDL
