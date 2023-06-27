@@ -54,3 +54,97 @@ WHERE product_name IN (
 )
 END 
 
+
+use BirdPlatform
+
+/*
+drop FUNCTION dbo.CalculateAverageStar(int ID)
+Funtion tính average rate cho 1 biến productID truyền vào
+Nếu muốn dùng :SELECT dbo.CalculateAverageStar(123) AS average_star;
+*/
+CREATE FUNCTION dbo.CalculateAverageStar(@ID INT)
+  RETURNS DECIMAL(10,2)
+  AS
+  BEGIN
+    DECLARE @average DECIMAL(10,2);
+    
+    SELECT @average = AVG(star)
+    FROM feedback
+    WHERE productID = @ID;
+    
+    RETURN @average;
+  END;
+
+
+/*
+drop FUNCTION dbo.ShopCalculateAverageStar(int ID)
+Funtion tính average rate cho 1 biến productID truyền vào
+Nếu muốn dùng :SELECT dbo.ShopCalculateAverageStar(123) AS average_star;
+*/
+CREATE FUNCTION dbo.ShopCalculateAverageStar(@ID INT)
+  RETURNS DECIMAL(10,2)
+  AS
+  BEGIN
+    DECLARE @average DECIMAL(10,2);
+    
+    SELECT @average = AVG(rating)
+    FROM product
+    WHERE shopID = @ID;
+    
+    RETURN @average;
+  END;
+
+/* Update rating của shop 
+	drop trigger Update_Rating_trigger;
+	Mỗi lần bảng product được update, shopID được lưu vào biến @ID thông qua productID ở feedback từ max feedbackID dc inert(do identity)
+	sau đó truyền productID cho funtion dc khai báo ở trên, tính avg rating mới, sau đó update bảng product
+	*/
+CREATE TRIGGER Update_Rating_trigger ON feedback FOR insert
+as
+BEGIN  
+
+	Declare @ProductID int;
+	select @ProductID = (select productID from Feedback where feedbackID
+	=( select max(feedbackID) from feedback	)
+	);
+
+	Declare @ShopID int;
+	select @ShopID = (select shopID from Product where productID = @ProductID);
+
+
+	update Product set  product.rating = (select dbo.CalculateAverageStar(@ProductID))
+	where Product.productID = @ProductID
+	;
+
+	update shop set shop.rate = (select dbo.ShopCalculateAverageStar(@ShopID))
+	where shop.shopID =@ShopID;
+	
+END
+
+/*
+
+Muốn test thì thử 3 hàm này
+select * from Feedback
+select * from product
+select * from shop
+
+insert into Feedback values('img',2,'productID:1' ,1,1,CURRENT_TIMESTAMP)
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
