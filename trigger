@@ -133,6 +133,7 @@ insert into Feedback values('img',2,'productID:1' ,1,1,CURRENT_TIMESTAMP)
 
 
 
+drop trigger Update_Deleteacc_by_Violation_trigger
 
 CREATE TRIGGER Update_Deleteacc_by_Violation_trigger ON shop FOR update
 as
@@ -141,10 +142,8 @@ BEGIN
 	update account set  isDeleted   =  1 where accountID in (
 	select accountID from shop where violation > 10
 	) ;
+	insert into ReOpen values ((select top 1 accountID from shop where violation > 10), 'Shop has over 10 violation' , ' ');
 END
-
-
-
 
 
 
